@@ -1,7 +1,8 @@
 use std::io::Result;
 
-use std::io::{SeekFrom};
+use std::io::SeekFrom;
 mod mem;
+mod record;
 
 #[derive(Debug)]
 pub struct SlottedPage {}
