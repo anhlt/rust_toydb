@@ -2,6 +2,9 @@ use crate::file::File;
 
 use std::io::Result;
 use std::io::{Cursor, Error as IOError, ErrorKind, Read, Seek, SeekFrom, Write};
+
+
+#[derive(Debug)]
 pub struct InmemFile {
     contents: Cursor<Vec<u8>>,
 }

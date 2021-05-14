@@ -1,25 +1,35 @@
-use std::io::Result;
-
-use std::io::SeekFrom;
 mod mem;
 mod record;
 
+use record::WriteableRecord;
+use std::collections::HashMap;
+use std::io::Result;
+use std::io::SeekFrom;
+use mem::InmemFile;
+
 #[derive(Debug)]
-pub struct SlottedPage {}
-
-struct Header<T> {
-    slot_count: u8,
-    first_free_slot: Box<Slot<T>>,
+pub struct SlottedPage {
+    buffer : InmemFile,
+    look_up_table: HashMap<u32, usize>,
+    free_space_pointer: usize,
 }
 
-struct Slot<T> {
-    length: u8,
-    offset: Option<T>,
+impl SlottedPage {
+    fn add(&mut self, record: &dyn WriteableRecord, record_id: u32) {
+        let record_size = record.contents().len();
+        self.look_up_table
+            .insert(record_id, self.free_space_pointer + record_size);
+        self.free_space_pointer += record_size;
+    }
 }
 
-struct TID {
-    page_id: u32,
-    slot_id: u8,
+struct Header {
+    slots: Vec<Slot>,
+}
+
+struct Slot {
+    length: usize,
+    offset: usize,
 }
 
 pub trait File {
