@@ -1,15 +1,18 @@
-use crate::file::File;
+use crate::file_system::File;
 
 use std::io::Result;
 use std::io::{Cursor, Error as IOError, ErrorKind, Read, Seek, SeekFrom, Write};
-
 
 #[derive(Debug)]
 pub struct InmemFile {
     contents: Cursor<Vec<u8>>,
 }
 
-impl InmemFile {}
+impl InmemFile {
+    fn pos_and_data(&self) -> (u64, &[u8]) {
+        (self.contents.position(), self.contents.get_ref().as_slice())
+    }
+}
 
 impl Default for InmemFile {
     fn default() -> Self {
@@ -80,13 +83,7 @@ impl File for InmemFile {
 mod tests {
 
     use super::InmemFile;
-    use crate::file::File;
-    impl InmemFile {
-        // add code here
-        fn post_and_data(&self) -> (u64, &[u8]) {
-            (self.contents.position(), self.contents.get_ref().as_slice())
-        }
-    }
+    use crate::file_system::File;
 
     #[test]
     fn test_mem_file_read_write() {
@@ -97,7 +94,7 @@ mod tests {
         let written2 = f.write(b"|hello world").unwrap();
         assert_eq!(written2, 12);
 
-        let (pos, data) = f.post_and_data();
+        let (pos, data) = f.pos_and_data();
         assert_eq!(pos, 0);
         assert_eq!(
             String::from_utf8(Vec::from(data)).unwrap(),
@@ -109,7 +106,7 @@ mod tests {
 
         println!("{:?}", String::from_utf8(read_buf.clone()));
         assert_eq!(read, 5);
-        let (pos, _) = f.post_and_data();
+        let (pos, _) = f.pos_and_data();
         assert_eq!(pos, 5);
         read_buf.clear();
 

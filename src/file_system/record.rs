@@ -24,6 +24,7 @@ mod tests {
             self.content.as_bytes()
         }
         // add code here
+
     }
 
     #[test]
